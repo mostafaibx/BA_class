@@ -98,6 +98,23 @@ TABLES = {
         pk=["cost_entry_id"], fks=[]),
 }
 
+# Columns that are NULL by design (open process steps, optional attributes), even if a
+# particular generated dataset happens to contain no NULLs in them.
+NULLABLE_BY_DESIGN = {
+    "customers": {"city"},
+    "product_price_history": {"valid_to"},
+    "pickers": {"termination_date"},
+    "carriers": {"pickup_times_saturday"},
+    "orders": {"validated_ts", "validation_result", "validation_reason",
+               "customer_notified_ts", "promised_ship_by_ts"},
+    "backorders": {"expected_restock_date", "notice_sent_ts"},
+    "pick_tasks": {"picker_id", "assigned_ts", "pick_start_ts", "pick_end_ts",
+                   "picked_sku", "picked_qty"},
+    "qc_checks": {"qc_end_ts", "qc_result", "defect_type", "rework_minutes"},
+    "shipments": {"handoff_ts", "delivered_ts"},
+    "invoices": {"ledger_posted_ts"},
+}
+
 VARCHAR_STEPS = [2, 3, 5, 10, 20, 40, 60, 100, 200, 500]
 
 
@@ -151,7 +168,7 @@ def main():
            "Business meaning of each column: see [DATA_DICTIONARY.md](DATA_DICTIONARY.md). "
            "Typed DDL: [schema.sql](schema.sql).", "",
            "**Legend:** PK = primary key · UQ = unique · FK→t = foreign key to table t · "
-           "Nullable = NULLs observed in the data · Profile = allowed values (low-cardinality "
+           "Nullable = NULL allowed (by design or observed) · Profile = allowed values (low-cardinality "
            "text) or min … max. Values shown as `'x '` contain leading/trailing spaces.", "",
            "## Overview", "",
            "| Table | Source system | Grain | Rows | Columns | Primary key |",
@@ -188,10 +205,11 @@ def main():
             s = df[col]
             typ = logical_type(col, decl[col], s)
             nulls = int(s.isna().sum())
+            nullable = nulls > 0 or col in NULLABLE_BY_DESIGN.get(t, set())
             body.append(f"| {i} | `{col}` | {typ} | {key_role(col, meta)} | "
-                        f"{'YES' if nulls else 'NO'} | {nulls / len(df):.1%} | "
+                        f"{'YES' if nullable else 'NO'} | {nulls / len(df):.1%} | "
                         f"{s.nunique():,} | {profile_value(col, typ, s, key_cols)} |")
-            cols_ddl.append(f"    {col:<24} {typ}{'' if nulls else ' NOT NULL'}")
+            cols_ddl.append(f"    {col:<24} {typ}{'' if nullable else ' NOT NULL'}")
 
         cons = [f"    CONSTRAINT pk_{t} PRIMARY KEY ({', '.join(meta['pk'])})"]
         if meta.get("unique"):

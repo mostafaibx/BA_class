@@ -6,8 +6,14 @@ distribution company. The data follows the BPMN process
 It is intentionally **not** a star schema: you design and build the dimensional model
 yourselves, for example in Power BI.
 
-- What each table and column means: **[DATA_DICTIONARY.md](DATA_DICTIONARY.md)**
-- How the script works: this README
+| Document | Content |
+|---|---|
+| **README.md** (this file) | How the generator works, design choices, configuration |
+| **[DATA_DICTIONARY.md](DATA_DICTIONARY.md)** | Business meaning of each table and column, data-quality issues, KPI formulas |
+| **[SCHEMA.md](SCHEMA.md)** | Physical schema per table: types, PK/FK/UQ, nullability, profile. Auto-generated. |
+| **[schema.sql](schema.sql)** | Typed DDL (CREATE TABLE with constraints) for loading the raw layer into a database |
+| **[STAR_SCHEMA_RECOMMENDATIONS.md](STAR_SCHEMA_RECOMMENDATIONS.md)** | Recommended dimensional model, bus matrix, Power BI setup and DAX |
+| **[modeling/examples.sql](modeling/examples.sql)** | Tested staging, dimension and fact SQL views to start the model from |
 
 ---
 
@@ -17,8 +23,11 @@ yourselves, for example in Power BI.
 cd ~/Desktop/BA
 python3 -m venv .venv                 # once
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python generate_data.py
+.venv/bin/python generate_data.py     # 1. generate raw data
+.venv/bin/python document_schema.py   # 2. refresh SCHEMA.md + schema.sql from the data
 ```
+
+To try the example model views: `sqlite3 raw/ba_raw.sqlite < modeling/examples.sql`. Running `generate_data.py` again recreates the database, so re-apply the views after regenerating.
 
 Output (around 25k orders, about 5 seconds to run):
 
