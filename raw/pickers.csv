@@ -1,0 +1,11 @@
+﻿picker_id,picker_name,shift,employment_type,hire_date,termination_date
+PK001,Lukas Becker,EARLY,Permanent,2019-03-01,
+PK002,Anna Kowalski,EARLY,Permanent,2020-06-15,
+PK003,Mehmet Yilmaz,EARLY,Permanent,2018-09-01,
+PK004,Julia Wagner,EARLY,Permanent,2022-02-01,
+PK005,Sara Haddad,LATE,Permanent,2021-01-11,
+PK006,Jonas Fischer,LATE,Permanent,2017-07-01,
+PK007,Fatima Demir,LATE,Permanent,2022-10-03,
+PK008,Tobias Schulz,LATE,Permanent,2024-04-02,
+PK009,Kevin Krüger,EARLY,Temporary,2025-11-03,2026-01-16
+PK010,Marta Weber,LATE,Temporary,2025-11-03,2026-01-16
